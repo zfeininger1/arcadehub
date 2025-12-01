@@ -1,0 +1,45 @@
+# Ignore Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Archives (keep folder but ignore contents)
+archives/*
+!archives/.gitkeep
+
+# Temporary files
+*.tmp
+*.log
+
+# Personal/Sensitive files - exclude entire docs folder
+docs/
+
+# Environment and credentials
+.env
+.env.*
+*.pem
+*.key
+credentials.json
+aws-credentials.txt
+
+# AWS and secrets
+.aws/
+*.tfstate
+*.tfstate.backup

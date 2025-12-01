@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pong - Arcade Hub</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Poppins:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Mobile Controls CSS -->
+    <link rel="stylesheet" href="../css/mobile-controls.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(15, 12, 41, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px 30px;
+        }
+
+        nav a {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #00ffff;
+            transform: translateX(-5px);
+        }
+
+        /* Game Container */
+        .game-container {
+            margin-top: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Main game area - horizontal layout */
+        .game-area {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Left side - canvas and scores */
+        .game-left {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+
+        /* Right side - instructions and controls */
+        .game-right {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 350px;
+        }
+
+        h1 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            background: linear-gradient(90deg, #ff00ff, #00ffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 0, 255, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .game-info {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.9rem;
+            color: #00ffff;
+            text-align: center;
+            line-height: 1.8;
+        }
+
+        .score-display {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2rem;
+            color: #ff00ff;
+            text-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
+            margin-top: 10px;
+        }
+
+        /* Canvas Container */
+        .canvas-container {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(20px);
+            border: 3px solid #ff00ff;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 0 50px rgba(255, 0, 255, 0.5);
+            position: relative;
+        }
+
+        canvas {
+            display: block;
+            background: #000;
+            border: 2px solid #00ffff;
+            border-radius: 10px;
+            box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        canvas:hover {
+            border-color: #ff00ff;
+            box-shadow: inset 0 0 30px rgba(255, 0, 255, 0.3);
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.8rem;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #ff00ff, #00ffff);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(255, 0, 255, 0.4);
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 40px rgba(255, 0, 255, 0.7);
+        }
+
+        button:active {
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: left;
+        }
+
+        .instructions h2 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1rem;
+            color: #00ffff;
+            margin-bottom: 15px;
+        }
+
+        .instructions p {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 8px;
+        }
+
+        .key-hint {
+            display: inline-block;
+            background: rgba(255, 0, 255, 0.2);
+            border: 1px solid #ff00ff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: 600;
+            color: #ff00ff;
+            margin: 0 3px;
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .game-area {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .game-right {
+                max-width: 500px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .game-info {
+                font-size: 0.7rem;
+            }
+
+            canvas {
+                width: 100%;
+                height: auto;
+            }
+
+            button {
+                font-size: 0.7rem;
+                padding: 12px 20px;
+            }
+
+            /* Ensure game container has enough bottom space for mobile controls */
+            .game-container {
+                padding-bottom: 20px;
+                margin-bottom: 0;
+            }
+
+            /* Center the game area on mobile */
+            .game-area {
+                width: 100%;
+            }
+
+            /* Hide keyboard hints on mobile */
+            .key-hint {
+                display: none;
+            }
+
+            /* Show mobile instructions */
+            .mobile-instructions {
+                display: block !important;
+            }
+        }
+
+        /* Game Over Overlay */
+        .game-over-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 10;
+            justify-content: center;
+            align-items: center;
+            border-radius: 17px;
+            /* Matches canvas container border radius minus border */
+        }
+
+        .game-over-content {
+            background: rgba(20, 20, 20, 0.95);
+            border: 2px solid #ff00ff;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(255, 0, 255, 0.4);
+            max-width: 80%;
+            position: relative;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .game-over-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px currentColor;
+        }
+
+        .win-text {
+            color: #00ffff;
+        }
+
+        .lose-text {
+            color: #ff00ff;
+        }
+
+        .final-score {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2rem;
+            color: white;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            line-height: 1;
+            transition: all 0.3s ease;
+            box-shadow: none;
+        }
+
+        .close-button:hover {
+            color: #ff00ff;
+            transform: scale(1.2);
+            box-shadow: none;
+        }
+
+        .title-icon {
+            -webkit-text-fill-color: #39ff14;
+            text-shadow: 0 0 20px rgba(57, 255, 20, 0.8);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav>
+        <a href="../hub.html">
+            <span style="font-size: 1.5rem;">🎮</span>
+            <span>Arcade Hub</span>
+        </a>
+        <a href="../login.html" style="
+            display: inline-block;
+            padding: 8px 20px;
+            background: transparent;
+            border: 2px solid #fff;
+            border-radius: 50px;
+            color: #fff;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-left: auto;
+        " onmouseover="this.style.background='#fff'; this.style.color='#333';"
+            onmouseout="this.style.background='transparent'; this.style.color='#fff';">
+            LOGIN
+        </a>
+    </nav>
+
+    <!-- Game Container -->
+    <div class="game-container">
+        <h1><span class="title-icon">🏓</span> PONG <span class="title-icon">🏓</span></h1>
+
+        <!-- Main game area with horizontal layout -->
+        <div class="game-area">
+            <!-- Left side: Canvas and scores -->
+            <div class="game-left">
+                <div class="game-info">
+                    <p id="gameStatus">GET READY!</p>
+                    <div class="score-display">Score: <span id="scoreDisplay">0 - 0</span></div>
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="gameCanvas" width="550" height="370"></canvas>
+
+                    <!-- Game Over Overlay -->
+                    <div class="game-over-overlay" id="gameOverOverlay">
+                        <div class="game-over-content">
+                            <button class="close-button" id="closeGameOver">&times;</button>
+                            <h2 class="game-over-title" id="gameOverTitle">GAME OVER</h2>
+                            <div class="final-score" id="finalScoreText">Score: 0 - 0</div>
+                            <button id="playAgainBtn">Play Again</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right side: Instructions and controls -->
+            <div class="game-right">
+                <div class="instructions">
+                    <h2>How to Play</h2>
+                    <p class="desktop-instructions">Use <span class="key-hint">W</span> <span class="key-hint">S</span>
+                        keys to move your paddle</p>
+                    <p class="mobile-instructions" style="display: none;">Touch the top half of the screen to move up,
+                        bottom half to move down</p>
+                    <p>Play endlessly and rack up points!</p>
+                    <p>Ball speed increases on paddle hits</p>
+                </div>
+
+                <div class="controls">
+                    <button id="startBtn">Start Game</button>
+                    <button id="pauseBtn" disabled>Pause</button>
+                    <button id="resetBtn">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Controls -->
+    <div class="mobile-controls">
+        <div class="action-buttons">
+            <button class="control-btn" id="pongUp">↑<br><small>W</small></button>
+            <button class="control-btn" id="pongDown">↓<br><small>S</small></button>
+        </div>
+    </div>
+
+    <script>
+        // Check if running in campaign mode
+        const urlParams = new URLSearchParams(window.location.search);
+        const isCampaignMode = urlParams.get('campaign') === 'true';
+
+        // Hide login button in campaign mode
+        if (isCampaignMode) {
+            const loginBtn = document.querySelector('nav a[href="../login.html"]');
+            if (loginBtn) loginBtn.style.display = 'none';
+        }
+
+        // Canvas setup
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const gameStatus = document.getElementById('gameStatus');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // Modal elements
+        const gameOverOverlay = document.getElementById('gameOverOverlay');
+        const gameOverTitle = document.getElementById('gameOverTitle');
+        const finalScoreText = document.getElementById('finalScoreText');
+        const closeGameOverBtn = document.getElementById('closeGameOver');
+        const playAgainBtn = document.getElementById('playAgainBtn');
+
+        // Game constants
+        const PADDLE_WIDTH = 10;
+        const PADDLE_HEIGHT = 80;
+        const BALL_RADIUS = 8;
+        const INITIAL_BALL_SPEED = 5;
+        const COMPUTER_LEVEL = 0.08; // AI interpolation factor (0.0 to 1.0)
+        const WINNING_SCORE = 5; // Score needed to win in campaign mode
+
+        // Game state
+        let gameRunning = false;
+        let gamePaused = false;
+        let animationId;
+        let currentGameId = null;
+
+        // Objects
+        const player = {
+            x: 10,
+            y: canvas.height / 2 - PADDLE_HEIGHT / 2,
+            width: PADDLE_WIDTH,
+            height: PADDLE_HEIGHT,
+            color: '#00ffff',
+            score: 0,
+            dy: 0,
+            speed: 8
+        };
+
+        const computer = {
+            x: canvas.width - PADDLE_WIDTH - 10,
+            y: canvas.height / 2 - PADDLE_HEIGHT / 2,
+            width: PADDLE_WIDTH,
+            height: PADDLE_HEIGHT,
+            color: '#00ffff',
+            score: 0,
+            dy: 0,
+            speed: 6
+        };
+
+        const ball = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            radius: BALL_RADIUS,
+            speed: INITIAL_BALL_SPEED,
+            dx: INITIAL_BALL_SPEED,
+            dy: INITIAL_BALL_SPEED,
+            color: '#ff00ff'
+        };
+
+        // Input handling
+        const keys = {
+            w: false,
+            s: false
+        };
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === 'w') keys.w = true;
+            if (e.key.toLowerCase() === 's') keys.s = true;
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.key.toLowerCase() === 'w') keys.w = false;
+            if (e.key.toLowerCase() === 's') keys.s = false;
+        });
+
+        // Mobile touch controls - canvas based
+        let touchMovingUp = false;
+        let touchMovingDown = false;
+
+        canvas.addEventListener('touchstart', handleTouch);
+        canvas.addEventListener('touchmove', handleTouch);
+        canvas.addEventListener('touchend', () => {
+            touchMovingUp = false;
+            touchMovingDown = false;
+        });
+
+        function handleTouch(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const touchY = touch.clientY - rect.top;
+
+            // Determine if touch is in top half or bottom half of canvas
+            const midY = rect.height / 2;
+
+            if (touchY < midY) {
+                touchMovingUp = true;
+                touchMovingDown = false;
+            } else {
+                touchMovingDown = true;
+                touchMovingUp = false;
+            }
+        }
+
+        // Drawing functions
+        function drawRect(x, y, w, h, color) {
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, w, h);
+        }
+
+        function drawArc(x, y, r, color) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2, false);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function drawNet() {
+            ctx.strokeStyle = 'rgba(0, 255, 255, 0.2)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([15, 15]);
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, 0);
+            ctx.lineTo(canvas.width / 2, canvas.height);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        function draw() {
+            // Clear canvas
+            drawRect(0, 0, canvas.width, canvas.height, '#000');
+
+            drawNet();
+
+            // Draw paddles
+            drawRect(player.x, player.y, player.width, player.height, player.color);
+            drawRect(computer.x, computer.y, computer.width, computer.height, computer.color);
+
+            // Draw ball
+            drawArc(ball.x, ball.y, ball.radius, ball.color);
+        }
+
+        // Async update function handling movement, collisions, scoring, and backend persistence
+        async function update() {
+            // Move player paddle
+            if (keys.w && player.y > 0) {
+                player.y -= player.speed;
+            }
+            if (keys.s && player.y + player.height < canvas.height) {
+                player.y += player.speed;
+            }
+
+            // Touch controls for paddle
+            if (touchMovingUp && player.y > 0) {
+                player.y -= player.speed;
+            }
+            if (touchMovingDown && player.y + player.height < canvas.height) {
+                player.y += player.speed;
+            }
+
+            // Move computer paddle (simple AI)
+            const targetY = ball.y - computer.height / 2;
+            computer.y += (targetY - computer.y) * COMPUTER_LEVEL;
+            if (computer.y < 0) computer.y = 0;
+            if (computer.y + computer.height > canvas.height) computer.y = canvas.height - computer.height;
+
+            // Move ball
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+
+            // Wall collision (top/bottom)
+            if (ball.y - ball.radius <= 0 || ball.y + ball.radius >= canvas.height) {
+                ball.dy = -ball.dy;
+            }
+
+            // Paddle collision detection
+            const playerHit = (ball.x - ball.radius < player.x + player.width) &&
+                (ball.y > player.y && ball.y < player.y + player.height);
+            const computerHit = (ball.x + ball.radius > computer.x) &&
+                (ball.y > computer.y && ball.y < computer.y + computer.height);
+
+            if (playerHit) {
+                // Calculate relative hit position
+                let collidePoint = ball.y - (player.y + player.height / 2);
+                collidePoint = collidePoint / (player.height / 2);
+                const angleRad = (Math.PI / 4) * collidePoint;
+                const direction = (ball.x < canvas.width / 2) ? 1 : -1;
+                ball.speed += 0.5; // speed boost on hit
+                ball.dx = direction * ball.speed * Math.cos(angleRad);
+                ball.dy = ball.speed * Math.sin(angleRad);
+                // Push ball out of paddle to avoid sticking
+                ball.x = player.x + player.width + ball.radius;
+            } else if (computerHit) {
+                let collidePoint = ball.y - (computer.y + computer.height / 2);
+                collidePoint = collidePoint / (computer.height / 2);
+                const angleRad = (Math.PI / 4) * collidePoint;
+                const direction = (ball.x < canvas.width / 2) ? 1 : -1;
+                ball.speed += 0.5;
+                ball.dx = direction * ball.speed * Math.cos(angleRad);
+                ball.dy = ball.speed * Math.sin(angleRad);
+                ball.x = computer.x - ball.radius;
+            }
+
+            // Scoring
+            if (ball.x - ball.radius < 0) {
+                // Computer scores
+                computer.score++;
+                updateScoreDisplay();
+                console.log('🟢 Scoring: computer scores, gameId=', currentGameId, 'scores:', player.score, '-', computer.score);
+                await saveScore(player.score, computer.score, "IN_PROGRESS");
+
+                // Check campaign win/loss
+                if (isCampaignMode && computer.score >= WINNING_SCORE) {
+                    handleCampaignEnd(false);
+                    return;
+                }
+
+                resetBall();
+            } else if (ball.x + ball.radius > canvas.width) {
+                // Player scores
+                player.score++;
+                updateScoreDisplay();
+                console.log('🟢 Scoring: player scores, gameId=', currentGameId, 'scores:', player.score, '-', computer.score);
+                await saveScore(player.score, computer.score, "IN_PROGRESS");
+
+                // Check campaign win/loss
+                if (isCampaignMode && player.score >= WINNING_SCORE) {
+                    handleCampaignEnd(true);
+                    return;
+                }
+
+                resetBall();
+            }
+        }
+
+        function handleCampaignEnd(playerWon) {
+            // Stop the game
+            gameRunning = false;
+            gamePaused = false;
+            cancelAnimationFrame(animationId);
+
+            // Send message to parent window
+            if (window.parent !== window) {
+                console.log('Sending campaign gameOver message to parent. Player won:', playerWon, 'Scores:', player.score, '-', computer.score);
+                window.parent.postMessage({
+                    type: 'gameOver',
+                    playerWon: playerWon,
+                    playerScore: player.score,
+                    aiScore: computer.score
+                }, '*');
+            }
+        }
+
+        function resetBall() {
+            ball.x = canvas.width / 2;
+            ball.y = canvas.height / 2;
+            ball.speed = INITIAL_BALL_SPEED;
+            // Randomize direction
+            ball.dx = (Math.random() > 0.5 ? 1 : -1) * ball.speed;
+            ball.dy = (Math.random() > 0.5 ? 1 : -1) * ball.speed;
+        }
+
+        function updateScoreDisplay() {
+            scoreDisplay.innerHTML = `<span style="color: #00ffff">${player.score}</span> - <span style="color: #ff00ff">${computer.score}</span>`;
+        }
+
+        async function gameLoop() {
+            if (!gameRunning || gamePaused) return;
+
+            await update();
+            draw();
+
+            animationId = requestAnimationFrame(gameLoop);
+        }
+
+        async function startGame() {
+            // Always reset currentGameId and create a fresh game when starting
+            currentGameId = null;
+
+            // Ensure we have a game ID before starting gameplay
+            try {
+                const apiUrl = 'https://khfsvuxzl6.execute-api.us-east-2.amazonaws.com/DEV/pong-scores';
+                const payload = { action: 'start_game' };
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    // Lambda returns double-wrapped response: parse the body field
+                    const gameData = typeof data.body === 'string' ? JSON.parse(data.body) : data;
+                    currentGameId = gameData.game_id;
+                    console.log('✅ New game created, ID:', currentGameId);
+                } else {
+                    console.error('❌ Failed to create game:', await response.text());
+                    return; // abort start
+                }
+            } catch (err) {
+                console.error('❌ Error creating game:', err);
+                return; // abort start
+            }
+
+            if (gameRunning && !gamePaused) return;
+
+            if (gamePaused) {
+                // Resume game
+                gamePaused = false;
+                gameRunning = true;
+                pauseBtn.textContent = "Pause";
+                gameStatus.textContent = "PLAYING";
+                gameLoop();
+                return;
+            }
+
+            // Fresh start
+            gameRunning = true;
+            gamePaused = false;
+            startBtn.disabled = true;
+            pauseBtn.disabled = false;
+            startBtn.textContent = "Playing...";
+            gameStatus.textContent = "PLAYING";
+
+            // Reset scores to 0 when starting
+            player.score = 0;
+            computer.score = 0;
+            updateScoreDisplay();
+
+            // Verify we have a game ID before starting
+            if (!currentGameId) {
+                console.error('❌ CRITICAL: No game ID after start_game call! Cannot start game.');
+                startBtn.disabled = false;
+                startBtn.textContent = "Start Game";
+                gameStatus.textContent = "ERROR - TRY AGAIN";
+                return;
+            }
+
+            console.log('🎮 Starting game loop with game ID:', currentGameId);
+            gameLoop();
+        }
+
+        function togglePause() {
+            if (!gameRunning && !gamePaused) return;
+
+            gamePaused = !gamePaused;
+
+            if (gamePaused) {
+                pauseBtn.textContent = "Resume";
+                gameStatus.textContent = "PAUSED";
+                cancelAnimationFrame(animationId);
+            } else {
+                pauseBtn.textContent = "Pause";
+                gameStatus.textContent = "PLAYING";
+                gameLoop();
+            }
+        }
+
+        function resetGame() {
+            gameRunning = false;
+            gamePaused = false;
+            cancelAnimationFrame(animationId);
+
+            // Hide modal
+            gameOverOverlay.style.display = 'none';
+
+            player.score = 0;
+            computer.score = 0;
+            // DON'T reset currentGameId here - it will be reset when starting a new game
+            updateScoreDisplay();
+
+            // Reset positions
+            player.y = canvas.height / 2 - PADDLE_HEIGHT / 2;
+            computer.y = canvas.height / 2 - PADDLE_HEIGHT / 2;
+            resetBall();
+
+            // Initial draw
+            draw();
+
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            pauseBtn.textContent = "Pause";
+            startBtn.textContent = "Start Game";
+            gameStatus.textContent = "GET READY!";
+        }
+
+        function closeGameOver() {
+            gameOverOverlay.style.display = 'none';
+        }
+
+        function gameOver() {
+            gameRunning = false;
+            gamePaused = false;
+            cancelAnimationFrame(animationId);
+
+            let playerWon = player.score >= WINNING_SCORE;
+            let winnerText = playerWon ? "VICTORY!" : "DEFEAT";
+            let titleClass = playerWon ? "win-text" : "lose-text";
+
+            // Update modal content
+            gameOverTitle.textContent = winnerText;
+            gameOverTitle.className = "game-over-title " + titleClass;
+            finalScoreText.innerHTML = `FINAL SCORE<br><br><span style="color: #00ffff">${player.score}</span> - <span style="color: #ff00ff">${computer.score}</span>`;
+
+            // Save score to backend
+            saveScore(player.score, computer.score, playerWon ? "WIN" : "LOSS");
+
+            // Show modal
+            gameOverOverlay.style.display = 'flex';
+
+            startBtn.disabled = true;
+            pauseBtn.disabled = true;
+            startBtn.textContent = "Game Over";
+            gameStatus.textContent = "GAME OVER";
+        }
+
+        async function saveScore(playerScore, aiScore, result) {
+            try {
+                const apiUrl = 'https://khfsvuxzl6.execute-api.us-east-2.amazonaws.com/DEV/pong-scores';
+                const payload = {
+                    action: 'save_score',
+                    player_score: playerScore,
+                    ai_score: aiScore,
+                    result: result
+                };
+                // Ensure we have a game_id – if not, create a new game first
+                console.log('ℹ️  saveScore called. currentGameId =', currentGameId, '| Scores:', playerScore, '-', aiScore);
+                if (!currentGameId) {
+                    console.warn('⚠️ No game ID yet – creating a new game before saving score');
+                    const startResp = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'start_game' })
+                    });
+                    if (startResp.ok) {
+                        const startData = await startResp.json();
+                        // Lambda returns double-wrapped response: parse the body field
+                        const gameData = typeof startData.body === 'string' ? JSON.parse(startData.body) : startData;
+                        currentGameId = gameData.game_id;
+                        console.log('✅ New game created from saveScore, ID:', currentGameId);
+                    } else {
+                        console.error('❌ Failed to create game for score update:', await startResp.text());
+                        return;
+                    }
+                }
+                payload.game_id = currentGameId;
+                console.log('🔔 Sending payload to backend:', payload);
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Backend response:', data);
+                } else {
+                    console.error('❌ Failed to save score:', await response.text());
+                }
+            } catch (error) {
+                console.error('❌ Error calling API:', error);
+            }
+        }
+
+        // Event listeners
+        startBtn.addEventListener('click', startGame);
+        pauseBtn.addEventListener('click', togglePause);
+        resetBtn.addEventListener('click', resetGame);
+        closeGameOverBtn.addEventListener('click', closeGameOver);
+        playAgainBtn.addEventListener('click', () => {
+            resetGame();
+            startGame();
+        });
+
+        // Click outside to close
+        gameOverOverlay.addEventListener('click', (e) => {
+            if (e.target === gameOverOverlay) {
+                closeGameOver();
+            }
+        });
+
+        // Initial setup
+        resetBall();
+        draw();
+    </script>
+</body>
+
+</html>

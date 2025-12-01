@@ -1,0 +1,115 @@
+/* Mobile Control Styles - Shared across all games */
+
+.mobile-controls {
+    display: none;
+    width: 100%;
+    justify-content: space-around;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* Mobile controls are hidden - using canvas touch handlers instead */
+.mobile-controls {
+    display: none !important;
+}
+
+/* Individual control button styling */
+.control-btn {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: 3px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    font-family: 'Press Start 2P', cursive;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    touch-action: none;
+    transition: all 0.1s ease;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.control-btn small {
+    font-size: 10px;
+    margin-top: 2px;
+    opacity: 0.7;
+}
+
+/* Active state when pressed */
+.control-btn:active,
+.control-btn.pressed {
+    background: rgba(0, 255, 255, 0.5);
+    border-color: #00ffff;
+    transform: scale(0.95);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+}
+
+/* Direction pad layout (4-way controls) */
+.direction-pad {
+    display: grid;
+    grid-template-columns: repeat(3, 70px);
+    grid-template-rows: repeat(3, 70px);
+    gap: 10px;
+}
+
+/* Position buttons in grid */
+.direction-pad .control-btn:nth-child(1) {
+    grid-area: 1 / 2;
+    /* Up */
+}
+
+.direction-pad .control-btn:nth-child(2) {
+    grid-area: 2 / 1;
+    /* Left */
+}
+
+.direction-pad .control-btn:nth-child(3) {
+    grid-area: 2 / 3;
+    /* Right */
+}
+
+.direction-pad .control-btn:nth-child(4) {
+    grid-area: 3 / 2;
+    /* Down */
+}
+
+/* Action buttons (horizontal layout) */
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+/* Responsive adjustments for very small screens */
+@media (max-width: 400px) {
+    .control-btn {
+        width: 60px;
+        height: 60px;
+        font-size: 20px;
+    }
+
+    .direction-pad {
+        grid-template-columns: repeat(3, 60px);
+        grid-template-rows: repeat(3, 60px);
+        gap: 8px;
+    }
+
+    .control-btn small {
+        font-size: 8px;
+    }
+}
+
+/* Ensure controls don't interfere with game */
+.mobile-controls * {
+    -webkit-tap-highlight-color: transparent;
+}

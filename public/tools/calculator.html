@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Calculator - Advanced Math Operations</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap"
+        rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            position: relative;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Floating particles background */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: float 20s infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        .particle:nth-child(1) {
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .particle:nth-child(2) {
+            left: 20%;
+            animation-delay: 2s;
+        }
+
+        .particle:nth-child(3) {
+            left: 30%;
+            animation-delay: 4s;
+        }
+
+        .particle:nth-child(4) {
+            left: 40%;
+            animation-delay: 6s;
+        }
+
+        .particle:nth-child(5) {
+            left: 50%;
+            animation-delay: 8s;
+        }
+
+        .particle:nth-child(6) {
+            left: 60%;
+            animation-delay: 10s;
+        }
+
+        .particle:nth-child(7) {
+            left: 70%;
+            animation-delay: 12s;
+        }
+
+        .particle:nth-child(8) {
+            left: 80%;
+            animation-delay: 14s;
+        }
+
+        .particle:nth-child(9) {
+            left: 90%;
+            animation-delay: 16s;
+        }
+
+        .particle:nth-child(10) {
+            left: 95%;
+            animation-delay: 18s;
+        }
+
+        .main-container {
+            position: relative;
+            z-index: 1;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInDown 1s ease;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            filter: drop-shadow(0 0 30px rgba(102, 126, 234, 0.5));
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        /* Calculator Grid */
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Glassmorphism Cards */
+        .calc-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 35px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.8s ease;
+            animation-fill-mode: both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .calc-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .calc-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .calc-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .calc-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .calc-card:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        .calc-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 24px;
+            padding: 2px;
+            background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .calc-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 60px 0 rgba(0, 0, 0, 0.5);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .calc-card:hover::before {
+            opacity: 1;
+        }
+
+        /* Card Icon/Header */
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            gap: 15px;
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            filter: drop-shadow(0 0 20px currentColor);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .calc-card:nth-child(1) .card-icon {
+            color: #ff6b6b;
+        }
+
+        .calc-card:nth-child(2) .card-icon {
+            color: #4ecdc4;
+        }
+
+        .calc-card:nth-child(3) .card-icon {
+            color: #ffe66d;
+        }
+
+        .calc-card:nth-child(4) .card-icon {
+            color: #a8e6cf;
+        }
+
+        .calc-card:nth-child(5) .card-icon {
+            color: #ff8787;
+        }
+
+        .card-header h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Input Groups */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1.1rem;
+            font-family: 'Poppins', sans-serif;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            color: #fff;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Buttons */
+        button {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+            color: #fff;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            position: relative;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        button:active {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Different button colors for each card */
+        .calc-card:nth-child(1) button {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+        }
+
+        .calc-card:nth-child(1) button:hover {
+            box-shadow: 0 10px 40px rgba(255, 107, 107, 0.6);
+        }
+
+        .calc-card:nth-child(2) button {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+        }
+
+        .calc-card:nth-child(2) button:hover {
+            box-shadow: 0 10px 40px rgba(78, 205, 196, 0.6);
+        }
+
+        .calc-card:nth-child(3) button {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .calc-card:nth-child(3) button:hover {
+            box-shadow: 0 10px 40px rgba(240, 147, 251, 0.6);
+        }
+
+        .calc-card:nth-child(4) button {
+            background: linear-gradient(135deg, #a8e6cf 0%, #3ecd7c 100%);
+        }
+
+        .calc-card:nth-child(4) button:hover {
+            box-shadow: 0 10px 40px rgba(168, 230, 207, 0.6);
+        }
+
+        .calc-card:nth-child(5) button {
+            background: linear-gradient(135deg, #ffa07a 0%, #ff6961 100%);
+        }
+
+        .calc-card:nth-child(5) button:hover {
+            box-shadow: 0 10px 40px rgba(255, 160, 122, 0.6);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .calculator-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .calc-card {
+                padding: 25px;
+            }
+        }
+    </style>
+
+    <script>
+        // Create floating particles
+        window.addEventListener('load', () => {
+            const particlesContainer = document.querySelector('.particles');
+            for (let i = 0; i < 10; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                particlesContainer.appendChild(particle);
+            }
+        });
+
+        // Enhanced API call function with better visual feedback
+        var callAPI = (operation, num1, num2) => {
+            // Validate inputs
+            if (!num1 || !num2) {
+                showResult('⚠️ Please enter both numbers!', true);
+                return;
+            }
+
+            // instantiate a headers object
+            var myHeaders = new Headers();
+            // add content type header to object
+            myHeaders.append("Content-Type", "application/json");
+            // using built in JSON utility package turn object to string and store in a variable
+            var raw = JSON.stringify({ "operation": operation, "num1": num1, "num2": num2 });
+            // create a JSON object with parameters for API call and store in a variable
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: raw,
+                redirect: 'follow'
+            };
+            // make API call with parameters and use promises to get response
+            fetch("https://fato2j9vb6.execute-api.us-east-2.amazonaws.com/DEV/", requestOptions)
+                .then(response => response.text())
+                .then(result => showResult(JSON.parse(result).body, false))
+                .catch(error => {
+                    console.log('error', error);
+                    showResult('❌ Error calculating result', true);
+                });
+        }
+
+        // Custom result display with animations
+        function showResult(message, isError) {
+            // Create custom modal-style alert
+            const resultDiv = document.createElement('div');
+            resultDiv.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) scale(0.8);
+                background: ${isError ? 'rgba(255, 107, 107, 0.95)' : 'rgba(102, 126, 234, 0.95)'};
+                backdrop-filter: blur(20px);
+                padding: 40px 60px;
+                border-radius: 20px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+                z-index: 10000;
+                color: white;
+                font-family: 'Poppins', sans-serif;
+                font-size: 1.5rem;
+                font-weight: 600;
+                text-align: center;
+                opacity: 0;
+                transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            `;
+            resultDiv.textContent = message;
+            document.body.appendChild(resultDiv);
+
+            // Animate in
+            setTimeout(() => {
+                resultDiv.style.opacity = '1';
+                resultDiv.style.transform = 'translate(-50%, -50%) scale(1)';
+            }, 10);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                resultDiv.style.opacity = '0';
+                resultDiv.style.transform = 'translate(-50%, -50%) scale(0.8)';
+                setTimeout(() => resultDiv.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</head>
+
+<body>
+    <!-- Navigation Header -->
+    <nav
+        style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(15, 12, 41, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 15px 30px;">
+        <a href="../hub.html"
+            style="display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: white; font-size: 1.2rem; font-weight: 600; transition: all 0.3s ease;">
+            <span style="font-size: 1.5rem;">🎮</span>
+            <span>Arcade Hub</span>
+        </a>
+        <a href="../login.html" style="
+            display: inline-block;
+            padding: 8px 20px;
+            background: transparent;
+            border: 2px solid #fff;
+            border-radius: 50px;
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-left: auto;
+        " onmouseover="this.style.background='#fff'; this.style.color='#333';"
+            onmouseout="this.style.background='transparent'; this.style.color='#fff';">
+            LOGIN
+        </a>
+    </nav>
+
+    <!-- Add top padding to account for fixed nav -->
+    <div style="padding-top: 70px;">
+
+        <!-- Floating Particles Background -->
+        <div class="particles"></div>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Hero Section -->
+            <div class="hero">
+                <h1>Quantum Calculator</h1>
+                <p>Advanced Mathematical Operations at Light Speed ⚡</p>
+            </div>
+
+            <!-- Calculator Grid -->
+            <div class="calculator-grid">
+                <!-- Addition Card -->
+                <div class="calc-card">
+                    <div class="card-header">
+                        <span class="card-icon">➕</span>
+                        <h2>Addition</h2>
+                    </div>
+                    <div class="input-group">
+                        <label>First Number</label>
+                        <input type="number" id="add-num1" step="any" placeholder="Enter first number">
+                    </div>
+                    <div class="input-group">
+                        <label>Second Number</label>
+                        <input type="number" id="add-num2" step="any" placeholder="Enter second number">
+                    </div>
+                    <button type="button"
+                        onclick="callAPI('add', document.getElementById('add-num1').value, document.getElementById('add-num2').value)">
+                        Calculate Sum
+                    </button>
+                </div>
+
+                <!-- Subtraction Card -->
+                <div class="calc-card">
+                    <div class="card-header">
+                        <span class="card-icon">➖</span>
+                        <h2>Subtraction</h2>
+                    </div>
+                    <div class="input-group">
+                        <label>First Number</label>
+                        <input type="number" id="sub-num1" step="any" placeholder="Enter first number">
+                    </div>
+                    <div class="input-group">
+                        <label>Second Number</label>
+                        <input type="number" id="sub-num2" step="any" placeholder="Enter second number">
+                    </div>
+                    <button type="button"
+                        onclick="callAPI('subtract', document.getElementById('sub-num1').value, document.getElementById('sub-num2').value)">
+                        Calculate Difference
+                    </button>
+                </div>
+
+                <!-- Multiplication Card -->
+                <div class="calc-card">
+                    <div class="card-header">
+                        <span class="card-icon">✖️</span>
+                        <h2>Multiplication</h2>
+                    </div>
+                    <div class="input-group">
+                        <label>First Number</label>
+                        <input type="number" id="mult-num1" step="any" placeholder="Enter first number">
+                    </div>
+                    <div class="input-group">
+                        <label>Second Number</label>
+                        <input type="number" id="mult-num2" step="any" placeholder="Enter second number">
+                    </div>
+                    <button type="button"
+                        onclick="callAPI('multiply', document.getElementById('mult-num1').value, document.getElementById('mult-num2').value)">
+                        Calculate Product
+                    </button>
+                </div>
+
+                <!-- Division Card -->
+                <div class="calc-card">
+                    <div class="card-header">
+                        <span class="card-icon">➗</span>
+                        <h2>Division</h2>
+                    </div>
+                    <div class="input-group">
+                        <label>Numerator</label>
+                        <input type="number" id="div-num1" step="any" placeholder="Enter numerator">
+                    </div>
+                    <div class="input-group">
+                        <label>Denominator</label>
+                        <input type="number" id="div-num2" step="any" placeholder="Enter denominator">
+                    </div>
+                    <button type="button"
+                        onclick="callAPI('divide', document.getElementById('div-num1').value, document.getElementById('div-num2').value)">
+                        Calculate Quotient
+                    </button>
+                </div>
+
+                <!-- Power Card -->
+                <div class="calc-card">
+                    <div class="card-header">
+                        <span class="card-icon">⚡</span>
+                        <h2>Exponentiation</h2>
+                    </div>
+                    <div class="input-group">
+                        <label>Base Number</label>
+                        <input type="number" id="pow-num1" step="any" placeholder="Enter base">
+                    </div>
+                    <div class="input-group">
+                        <label>Exponent</label>
+                        <input type="number" id="pow-num2" step="any" placeholder="Enter exponent">
+                    </div>
+                    <button type="button"
+                        onclick="callAPI('power', document.getElementById('pow-num1').value, document.getElementById('pow-num2').value)">
+                        Calculate Power
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div> <!-- Close wrapper div -->
+</body>
+
+</html>
